@@ -1,0 +1,14 @@
+//
+// Created by diogo on 16/01/2022.
+//
+
+#ifndef AED_TRANSPORTESPUBLICOSPORTO_STOP_H
+#define AED_TRANSPORTESPUBLICOSPORTO_STOP_H
+
+
+class Stop {
+
+};
+
+
+#endif //AED_TRANSPORTESPUBLICOSPORTO_STOP_H

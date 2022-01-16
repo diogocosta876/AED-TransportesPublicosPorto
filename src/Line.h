@@ -1,0 +1,14 @@
+//
+// Created by diogo on 16/01/2022.
+//
+
+#ifndef AED_TRANSPORTESPUBLICOSPORTO_LINE_H
+#define AED_TRANSPORTESPUBLICOSPORTO_LINE_H
+
+
+class Line {
+
+};
+
+
+#endif //AED_TRANSPORTESPUBLICOSPORTO_LINE_H

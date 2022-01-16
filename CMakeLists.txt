@@ -7,7 +7,7 @@ add_subdirectory(lib/googletest-master)
 include_directories(lib/googletest-master/googletest/include)
 include_directories(lib/googletest-master/googlemock/include)
 
-add_executable(AED-TransportesPublicosPorto main.cpp)
+add_executable(AED-TransportesPublicosPorto main.cpp src/Line.cpp src/Line.h src/Stop.cpp src/Stop.h)
 
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
