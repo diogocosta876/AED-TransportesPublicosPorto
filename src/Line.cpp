@@ -1,19 +1,20 @@
 #include "Line.h"
 using namespace std;
 
-const string &Line::getCode1() const {
-    return code1;
+
+Line::Line(const string& code, const string& name) {
+    this->code = code;
+    this->name = name;
 }
 
-const string &Line::getCode2() const {
-    return code2;
+string Line::getCode() const {
+    return code;
+}
+string Line::getName() const {
+    return name;
 }
 
-const string &Line::getName1() const {
-    return name1;
-}
-
-const string &Line::getName2() const {
-    return name2;
+bool Line::hasDirection() const {
+    return hasDir;
 }
 

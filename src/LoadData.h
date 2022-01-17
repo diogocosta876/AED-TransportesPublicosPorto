@@ -12,14 +12,17 @@
 
 class LoadData {
     vector<Stop> stops;
+    vector<Line> lines;
 
 public:
     LoadData();
-    void displayStops();
+    void displayStops() const;
+    void displayLines() const;
 
 private:
     void loadStops();
     void loadLines();
+    void populateLines();
 
 };
 
