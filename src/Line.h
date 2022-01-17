@@ -12,8 +12,6 @@ class Line {
     std::string name2;
     std::vector<Stop> stops;
 public:
-    void loadStops();
-
     const std::string &getCode1() const;
     const std::string &getCode2() const;
     const std::string &getName1() const;

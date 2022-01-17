@@ -17,6 +17,3 @@ const string &Line::getName2() const {
     return name2;
 }
 
-void Line::loadStops() {
-
-}

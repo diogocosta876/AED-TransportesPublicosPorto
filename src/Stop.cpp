@@ -1,6 +1,14 @@
 #include "Stop.h"
 using namespace std;
 
+Stop::Stop(const string& code, const string& name, const string& zone, double latitude, double longitude) {
+    this->code = code;
+    this->name = name;
+    this->zone = zone;
+    this->latitude = latitude;
+    this->longitude = longitude;
+}
+
 const string& Stop::getCode() const {
     return code;
 }
@@ -14,10 +22,12 @@ const string& Stop::getZone() const {
 }
 
 double Stop::getLatitude() const {
-    return 0;
+    return latitude;
 }
 
 double Stop::getLongitude() const {
-    return 0;
+    return longitude;
 }
+
+
 

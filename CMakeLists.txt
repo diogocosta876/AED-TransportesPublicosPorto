@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.17)
 project(AED-TransportesPublicosPorto)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(lib/googletest-master)
 include_directories(lib/googletest-master/googletest/include)
 include_directories(lib/googletest-master/googlemock/include)
 
-add_executable(AED-TransportesPublicosPorto main.cpp src/Line.cpp src/Line.h src/Stop.cpp src/Stop.h)
+add_executable(AED-TransportesPublicosPorto main.cpp src/Line.cpp src/Line.h src/Stop.cpp src/Stop.h src/AdminMenu.cpp src/AdminMenu.h src/LoadData.cpp src/LoadData.h)
 
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
