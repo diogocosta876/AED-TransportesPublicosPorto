@@ -8,13 +8,13 @@
 class Line {
     string code;
     string name;
-    bool hasDir;
-    vector<Stop> stops;
+    vector<Stop*> stops;
 public:
     Line(const string& code, const string& name);
+    void addStop(Stop* stop);
     string getCode() const;
     string getName() const;
-    bool hasDirection() const;
+    const vector<Stop*> &getStops() const;
 };
 
 

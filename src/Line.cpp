@@ -7,6 +7,11 @@ Line::Line(const string& code, const string& name) {
     this->name = name;
 }
 
+void Line::addStop(Stop* stop) {
+    stops.push_back(stop);
+}
+
+
 string Line::getCode() const {
     return code;
 }
@@ -14,7 +19,7 @@ string Line::getName() const {
     return name;
 }
 
-bool Line::hasDirection() const {
-    return hasDir;
+const vector<Stop*> &Line::getStops() const {
+    return stops;
 }
 

@@ -1,17 +1,21 @@
 // AED 2021/2022 - Aula Pratica 09
 // Pedro Ribeiro (DCC/FCUP) [03/01/2022]
 
-#include "graph.h"
+#include "Graph.h"
 
 // Constructor: nr nodes and direction (default: undirected)
-Graph::Graph(int num, bool dir) : n(num), hasDir(dir), nodes(num+1) {
+Graph::Graph(const vector<Stop*>& stops) {
+    n = stops.size();
+    for(Stop* stop : stops){
+        nodes.emplace_back(*stop);
+    }
 }
 
-// Add edge from source to destination with a certain weight
-void Graph::addEdge(int src, int dest, int weight) {
-    if (src<1 || src>n || dest<1 || dest>n) return;
-    nodes[src].adj.push_back({dest, weight});
-    if (!hasDir) nodes[dest].adj.push_back({src, weight});
+void Graph::addEdge(int src, int dest, string lineCode) {
+    if (src<0 || src>n || dest<0 || dest>n) return;
+    Node node1 = nodes[src]; Node node2 = nodes[dest];
+    double weight = haversine(node1.stop.getLatitude(), node1.stop.getLongitude(), node2.stop.getLatitude(), node2.stop.getLongitude());
+    nodes[src].adj.push_back({dest, weight, lineCode});
 }
 
 // Depth-First Search: example implementation
@@ -52,9 +56,8 @@ void Graph::bfs(int v) {
 // a) Contando diferentes somas de pares
 // TODO
 int Graph::outDegree(int v) {
-    if (find(nodes.begin(), nodes.end(), v) != nodes.end())
-        return nodes[v].adj.size();
-    else return -1;
+    if(v < 1 || v > n) return -1;
+    else return nodes[v].adj.size();
 }
 
 // ----------------------------------------------------------
@@ -67,7 +70,7 @@ int Graph::outDegree(int v) {
 int Graph::connectedComponents() {
     int counter = 0;
     for (int v=1; v<=n; v++) nodes[v].visited = false;
-    for (int v=0;)
+    return 0;
 }
 
 // ..............................
@@ -94,17 +97,47 @@ int Graph::distance(int a, int b) {
     return 0;
 }
 
-// ..............................
-// b) Diametro
 // TODO
 int Graph::diameter() {
     return 0;
 }
 
-// ----------------------------------------------------------
-// Exercicio 5: To or not be… a DAG!
-// ----------------------------------------------------------
 // TODO
 bool Graph::hasCycle() {
     return false;
+}
+
+double Graph::haversine(double lat1, double lon1, double lat2, double lon2){
+    // distance between latitudes
+    // and longitudes
+    double dLat = (lat2 - lat1) *
+                  M_PI / 180.0;
+    double dLon = (lon2 - lon1) *
+                  M_PI / 180.0;
+
+    // convert to radians
+    lat1 = (lat1) * M_PI / 180.0;
+    lat2 = (lat2) * M_PI / 180.0;
+
+    // apply formulae
+    double a = pow(sin(dLat / 2), 2) +
+               pow(sin(dLon / 2), 2) *
+               cos(lat1) * cos(lat2);
+    double rad = 6371;
+    double c = 2 * asin(sqrt(a));
+    return rad * c;
+}
+
+void Graph::debug_displayEdges() const {
+    int counter = 0;
+    for (Node node: nodes){
+        if (counter > 5) break;
+        if (!node.adj.empty()){
+            counter++;
+            cout << "edges detected\n";
+            for (Edge edge: node.adj){
+                cout << "dest: " << edge.dest << " distance: " << edge.weight << endl;
+            }
+        }
+    }
 }
