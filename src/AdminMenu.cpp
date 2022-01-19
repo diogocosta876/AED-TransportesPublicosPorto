@@ -5,12 +5,8 @@
 
 AdminMenu::AdminMenu(LoadData data): data(std::move(data)){}
 
-//todo calcular caminho mais curto
-//todo adicionar capacidade de andar entre paragens X distancia
-
-
 void AdminMenu::mainMenu(int page_counter) {
-    //For faster development
+    //For faster development //TODO REMOVE PATH DEBUGGING SCREEN
     selectedStopID_origin = 1129;
     selectedStopID_destination = 217;
 
@@ -190,6 +186,7 @@ void AdminMenu::tripMenu() {
     switch (input) {
         case 1:
             //TODO SHORTEST PATH (DIJKSTRA)
+            data.getGraph().dijkstra(selectedStopID_origin, selectedStopID_destination);
             break;
         case 2:
             //TODO PATH WITH LESS STOPS (PESQUISA EM LARGURA BFS)

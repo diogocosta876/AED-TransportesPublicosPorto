@@ -46,6 +46,8 @@ public:
     bool hasCycle();
     static double haversine(double lat1, double lon1, double lat2, double lon2);
     void debug_displayEdges() const;
+
+    int dijkstra(int orig, int dest) const;
 };
 
 #endif
