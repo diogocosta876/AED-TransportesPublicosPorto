@@ -19,10 +19,10 @@ class LoadData {
     map<string, int> stopCodes;
 public:
     LoadData();
-    const Graph &getGraph() const;
-    const vector<Stop*>& getStops() const;
-    const vector<Line*>& getLines() const;
-    const map<string, int>& getStopCodes() const;
+    Graph& getGraph();
+    vector<Stop*>& getStops();
+    vector<Line*>& getLines();
+    map<string, int>& getStopCodes();
     void displayStops() const;
     void displayLines() const;
     void displayStopCodes() const;

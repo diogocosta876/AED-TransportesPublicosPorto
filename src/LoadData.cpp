@@ -116,18 +116,18 @@ void LoadData::debug_displayEdges() const {
     graph.debug_displayEdges();
 }
 
-const Graph& LoadData::getGraph() const {
+Graph& LoadData::getGraph() {
     return graph;
 }
 
-const vector<Stop*>& LoadData::getStops() const {
+vector<Stop*>& LoadData::getStops() {
     return stops;
 }
 
-const vector<Line*>& LoadData::getLines() const {
+vector<Line*>& LoadData::getLines() {
     return lines;
 }
 
-const map<string, int>& LoadData::getStopCodes() const {
+map<string, int>& LoadData::getStopCodes() {
     return stopCodes;
 }

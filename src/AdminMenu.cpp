@@ -5,10 +5,13 @@
 
 AdminMenu::AdminMenu(LoadData data): data(std::move(data)){}
 
+//TODO INTEGRAR BFS NUM ALGORITMO
+//TODO FAZER O LOADDATA INSERIR VARIAS INFORMACOES NA EDGE
+
 void AdminMenu::mainMenu(int page_counter) {
     //For faster development //TODO REMOVE PATH DEBUGGING SCREEN
-    selectedStopID_origin = 1129;
-    selectedStopID_destination = 217;
+    selectedStopID_origin = 233;
+    selectedStopID_destination = 215;
 
     //Checks if stops have already been selected
     if(selectedStopID_origin != -1 && selectedStopID_destination != -1) tripMenu();
@@ -188,9 +191,12 @@ void AdminMenu::tripMenu() {
             //TODO SHORTEST PATH (DIJKSTRA)
             data.getGraph().dijkstra(selectedStopID_origin, selectedStopID_destination);
             break;
-        case 2:
+        case 2: {
             //TODO PATH WITH LESS STOPS (PESQUISA EM LARGURA BFS)
+            vector<int> path = data.getGraph().bfsPathSearch(selectedStopID_origin, selectedStopID_destination);
+            pathMenu(path);
             break;
+        }
         case 3:
             //TODO PATH WITH LESS LINE CHANGES
             break;
@@ -214,11 +220,76 @@ void AdminMenu::tripMenu() {
     }
 }
 
+void AdminMenu::pathMenu(vector<int> path, int path_distance) {
+    printTitle();
+
+    int table_length = 57;
+    //Table Line Separator
+    for (int i = 0; i < table_length; ++i) cout << "-"; cout << "\n";
+    printInTable("Path", 55); cout << "|\n";
+    for (int i = 0; i < table_length; ++i) cout << "-"; cout << "\n";
+
+    //Table Content
+    Stop* origem = data.getStops()[selectedStopID_origin];
+    printInTable("Code", 10);
+    printInTable("Zone", 8);
+    printInTable("Name", 35);
+    cout << "|\n";
+
+    for (int stopID: path) {
+        auto stop = data.getStops()[stopID];
+        printInTable(stop->getCode(), 10);
+        printInTable(stop->getZone(), 8);
+        printInTable(stop->getName(), 35);
+        cout << "|\n";
+    }
+    //Table Line Separator
+    for (int i = 0; i < table_length; ++i) cout << "-"; cout << "\n";
+
+    list<string> lines_used = data.getGraph().determineLineChanges(path);
+    double distance_traveled = determineDistanceTraveled(path);
+    cout << "Stop Count: " << path.size() << endl;
+    cout << "Lines Used: ";
+    for (string line: lines_used){ cout << line << " ";}
+    cout << "\nDistance Traveled: " << "NOT IMPLEMENTED" << endl;
+
+    cout << "\n";
+    cout << "\tAdmin Menu\n";
+    cout << "(1) Go Back\n";
+    cout << "(2) Go to the Main Menu\n";
+    cout << "(0) Exit\n";
+    cout << " > ";
+
+    //Receive input
+    vector<int> possible_inputs = {0,1,2,3,4,5,6}; vector<string> possible_inputs_selection;
+    int input; int input_sub;
+    input = getUserInput(possible_inputs);
+
+    switch (input) {
+        case 1:
+            tripMenu();
+            break;
+        case 2:
+            selectedStopID_origin = -1;
+            selectedStopID_destination = -1;
+            mainMenu();
+        case 0:
+            exit(0);
+        default:
+            break;
+    }
+}
+
 void AdminMenu::selectStop(Stop *stop) {
     auto hashTable = data.getStopCodes();
     int index = hashTable.find(stop->getCode())->second;
     if (selectedStopID_origin == -1) selectedStopID_origin = index;
     else selectedStopID_destination = index;
+}
+
+
+double AdminMenu::determineDistanceTraveled(vector<int> path) {
+    return 0;
 }
 
 int AdminMenu::getUserInput(const vector<int>& inputs) {
@@ -293,3 +364,5 @@ ____ ___ ____ ___           ___ ____ ____ _  _ ____ ___  ____ ____ ___ ____ ____
 ___]  |  |___ |              |  |  \ |  | | \| ___] |    |__| |  \  |  |___ ___]    |    |__| |__] |___ | |___ |__| ___])"
 << endl;
 }
+
+

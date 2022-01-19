@@ -18,7 +18,7 @@ void Graph::addEdge(int src, int dest, string lineCode) {
     nodes[src].adj.push_back({dest, weight, lineCode});
 }
 
-// Depth-First Search: example implementation
+// Depth-First Search: modified implementation to get the shortest path in unweighted graphs
 void Graph::dfs(int v) {
     cout << v << " "; // show node order
     nodes[v].visited = true;
@@ -29,89 +29,110 @@ void Graph::dfs(int v) {
     }
 }
 
-// Depth-First Search: example implementation
-void Graph::bfs(int v) {
-    for (int v=1; v<=n; v++) nodes[v].visited = false;
+// Breadth-First Search
+vector<int> Graph::bfsPathSearch(int src, int dest) {
+    vector<int> path;
+    int predecessor[n]; int dist[n];
+    for (int i=0; i<n; i++){
+        nodes[i].visited = false;
+        dist[i] = INT_MAX;
+        predecessor[i] = -1;
+    }
     queue<int> q; // queue of unvisited nodes
-    q.push(v);
-    nodes[v].visited = true;
+    q.push(src);
+    nodes[src].visited = true;
+    dist[src] = 0;
     while (!q.empty()) { // while there are still unvisited nodes
-        int u = q.front(); q.pop();
-        cout << u << " "; // show node order
-        for (auto e : nodes[u].adj) {
-            int w = e.dest;
-            if (!nodes[w].visited) {
-                q.push(w);
-                nodes[w].visited = true;
+        int a = q.front(); q.pop();
+        for (auto e : nodes[a].adj) {
+            int a_dest = e.dest;
+            if (!nodes[a_dest].visited) {
+                q.push(a_dest);
+                dist[a_dest] = dist[a] + 1;
+                predecessor[a_dest] = a;
+                nodes[a_dest].visited = true;
+
+                //if the destination was reached
+                if (a_dest == dest) {
+                    int crawl = dest;
+                    path.push_back(crawl);
+                    while (predecessor[crawl] != -1) {
+                        path.push_back(predecessor[crawl]);
+                        crawl = predecessor[crawl];
+                    }
+                    return path;
+                }
             }
         }
     }
+    return path;
 }
 
-// ----------------------------------------------------------
-// Exercicio 1: Introdução a uma classe simplificada de grafos
-// ----------------------------------------------------------
 
-// ..............................
-// a) Contando diferentes somas de pares
-// TODO
 int Graph::outDegree(int v) {
     if(v < 1 || v > n) return -1;
     else return nodes[v].adj.size();
 }
 
-// ----------------------------------------------------------
-// Exercicio 2: Componentes conexos
-// ----------------------------------------------------------
 
-// ..............................
-// a) Contando componentes conexos
-// TODO
 int Graph::connectedComponents() {
     int counter = 0;
     for (int v=1; v<=n; v++) nodes[v].visited = false;
     return 0;
 }
 
-// ..............................
-// b) Componente gigante
-// TODO
 int Graph::giantComponent() {
     return 0;
 }
 
 
-// ----------------------------------------------------------
-// Exercicio 3: Ordenacao topologica
-// ----------------------------------------------------------
-// TODO
 list<int> Graph::topologicalSorting() {
     list<int> order;
     return order;
 }
 
-// ..............................
-// a) Distancia entre dois nos
-// TODO
 int Graph::distance(int a, int b) {
     return 0;
 }
 
-// TODO
 int Graph::diameter() {
     return 0;
 }
 
-// TODO
 bool Graph::hasCycle() {
     return false;
 }
 
 int Graph::dijkstra(int orig, int dest) const{
     //TODO dijkstra
+    return 1;
 }
 
-
+list<string> Graph::determineLineChanges(vector<int> path) {
+    list<string> lines_used;
+    string current_line = ""; //line being used
+    bool found_same_line = false;
+    for (int i = 0; i<path.size();i++){
+        found_same_line = false;
+        //find edge that connects stopID and stopID+1 from path, then see if the line is alreay registed
+        auto edges = nodes[path[i]].adj;
+        for (const Edge& edge: edges){
+            if (edge.dest == path[i+1] && edge.lineCode == current_line){
+                found_same_line = true;
+                break;
+            }
+        }
+        if (!found_same_line){
+            for (const Edge& edge: nodes[path[i]].adj) {
+                if (edge.dest == path[i+1]) {
+                    current_line = edge.lineCode;
+                    lines_used.push_back(edge.lineCode);
+                }
+            }
+        }
+    }
+    return lines_used;
+}
 
 double Graph::haversine(double lat1, double lon1, double lat2, double lon2){
     // distance between latitudes
@@ -134,6 +155,7 @@ double Graph::haversine(double lat1, double lon1, double lat2, double lon2){
     return rad * c;
 }
 
+
 void Graph::debug_displayEdges() const {
     int counter = 0;
     for (Node node: nodes){
@@ -147,3 +169,4 @@ void Graph::debug_displayEdges() const {
         }
     }
 }
+

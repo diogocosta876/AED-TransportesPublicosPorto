@@ -21,7 +21,6 @@ class Graph {
         double weight; // An integer weight
         string lineCode;
     };
-
     struct Node {
         Stop stop;
         list<Edge> adj; // The list of outgoing edges (to adjacent nodes)
@@ -34,9 +33,10 @@ class Graph {
 
 public:
     explicit Graph(const vector<Stop*>& stops);
-    void addEdge(int src, int dest, string lineCode);
+    Graph(int n);
+    void addEdge(int src, int dest, string  = "");
     void dfs(int v);
-    void bfs(int v);
+    vector<int> bfsPathSearch(int src, int dest);
     int outDegree(int v);
     int connectedComponents();
     int giantComponent();
@@ -44,10 +44,11 @@ public:
     int distance(int a, int b);
     int diameter();
     bool hasCycle();
+    list<string> determineLineChanges(vector<int> path);
     static double haversine(double lat1, double lon1, double lat2, double lon2);
     void debug_displayEdges() const;
-
     int dijkstra(int orig, int dest) const;
+
 };
 
 #endif
