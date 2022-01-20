@@ -6,12 +6,11 @@
 AdminMenu::AdminMenu(LoadData data): data(std::move(data)){}
 
 //TODO INTEGRAR BFS NUM ALGORITMO
-//TODO FAZER O LOADDATA INSERIR VARIAS INFORMACOES NA EDGE
 
 void AdminMenu::mainMenu(int page_counter) {
     //For faster development //TODO REMOVE PATH DEBUGGING SCREEN
-    selectedStopID_origin = 215;
-    selectedStopID_destination = 234;
+    //selectedStopID_origin = 215;
+    //selectedStopID_destination = 234;
 
     //Checks if stops have already been selected
     if(selectedStopID_origin != -1 && selectedStopID_destination != -1) tripMenu();
@@ -41,16 +40,19 @@ void AdminMenu::mainMenu(int page_counter) {
     for (int i = 0; i < table_length; ++i) cout << "-";
     int totalpages = data.getLines().size()/6 + (data.getLines().size()%6>0);
     cout << "\n> Page " << page_counter << "/" << totalpages;
+    if (selectedStopID_origin != -1) cout << "\tOrigin: " << data.getStops()[selectedStopID_origin]->getCode();
     cout << "\n\n";
     cout << "\tAdmin Menu\n";
     cout << "(1) Select a Line\n";
-    cout << "(2) Next Page\n";
-    cout << "(3) Previous Page\n";
+    cout << "(2) Select a Stop\n";
+    cout << "(3) Select a Location\n";
+    cout << "(4) Next Page\n";
+    cout << "(5) Previous Page\n";
     cout << "(0) Exit\n";
     cout << " > ";
 
     //Receive input
-    vector<int> possible_inputs = {0,1,2,3};
+    vector<int> possible_inputs = {0,1,2,3,4,5};
     int input; int input_sub;
     input = getUserInput(possible_inputs);
 
@@ -61,12 +63,19 @@ void AdminMenu::mainMenu(int page_counter) {
             clearScreen();
             lineMenu(data.getLines()[input_sub]);
             break;
-        case 2:
+        case 2: {
+            selectStopByCodeMenu();
+            break;
+        }
+        case 3:
+            selectStopByLocationMenu();
+            break;
+        case 4:
             clearScreen();
             if (page_counter==totalpages) mainMenu(page_counter);
             else mainMenu(page_counter+1);
             break;
-        case 3:
+        case 5:
             clearScreen();
             if (page_counter==1) mainMenu(page_counter);
             else mainMenu(page_counter-1);
@@ -280,6 +289,130 @@ void AdminMenu::pathMenu(vector<int> path, int path_distance) {
     }
 }
 
+void AdminMenu::selectStopByCodeMenu() {
+    cout << "Insert Stop Code (0 to go back)> ";
+    string stop_name = getUserTextInput();
+    if (stop_name == "0") mainMenu();
+    bool found = false;
+    for (Stop* stop: data.getStops()){
+        if (stop->getCode() == stop_name){
+            selectStop(stop);
+            clearScreen();
+            mainMenu(1);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        cout << "\nStop Not Found! Try Again\n";
+        selectStopByCodeMenu();
+    }
+}
+
+void AdminMenu::selectStopByLocationMenu(bool userInsertedLocation, double lat, double lon) {
+    if (!userInsertedLocation){
+        while (lat == -INT_MAX) {
+            cin.clear();
+            if (!cin) cin.ignore(1000,'\n');
+            cout << "Insert latitude > ";
+            cin >> lat;
+        }
+        while (lon == -INT_MAX) {
+            cin.clear();
+            if (!cin) cin.ignore(1000,'\n');
+            cout << "Insert longitude > ";
+            cin >> lon;
+        }
+        selectStopByLocationMenu(true, lat, lon);
+    }
+    else {
+        vector<pair<Stop*, double>> closest_stops;
+        double min_dist = INT_MAX;
+        for(Stop* stop: data.getStops()){
+
+            sort(closest_stops.begin(), closest_stops.end(), [ ]( const pair<Stop*, double>& lhs, const pair<Stop*, double>& rhs )
+            {
+                return lhs.second < rhs.second;
+            });
+
+            double dist = Graph::haversine(lat, lon, stop->getLatitude(), stop->getLongitude());
+            if (dist < min_dist){
+                pair<Stop*, double> mypair;
+                mypair.first = stop; mypair.second = dist;
+                if(closest_stops.size() < 5)
+                    closest_stops.push_back(mypair);
+                else {
+                    closest_stops[4] = mypair;
+                    min_dist = closest_stops[4].second;
+                }
+            }
+        }
+
+        //OUTPUT
+        printTitle();
+
+        int table_length = 80;
+        cout << "5 CLOSEST STOPS:\n";
+        //Table Line Separator
+        for (int i = 0; i < table_length; ++i) cout << "-";
+        cout << "\n";
+        printInTable("ID", 10);
+        printInTable("Stop Code", 15);
+        printInTable("Stop Name", 25);
+        printInTable("Zone", 10);
+        printInTable("Distance", 13);
+        cout << "|\n";
+        //Table Line Separator
+        for (int i = 0; i < table_length; ++i) cout << "-";
+        cout << "\n";
+
+        //Table Content
+        for (int i = 0; i < closest_stops.size(); ++i) {
+            printInTable(to_string(i), 10);
+            printInTable(closest_stops[i].first->getCode(), 15);
+            printInTable(closest_stops[i].first->getName(), 25);
+            printInTable(closest_stops[i].first->getZone(), 10);
+            printInTable(to_string(closest_stops[i].second), 13);
+            cout << "|\n";
+        }
+        //Table Line Separator
+        for (int i = 0; i < table_length; ++i) cout << "-";
+        cout << "\n\n";
+        cout << "\tAdmin Menu\n";
+        cout << "(1) Select a Stop\n";
+        cout << "(2) Go Back\n";
+        cout << "(0) Exit\n";
+        cout << " > ";
+
+        //Receive input
+        vector<int> possible_inputs = {0, 1, 2};
+        vector<int> possible_inputs_selection;
+        int input;
+        int input_sub;
+        input = getUserInput(possible_inputs);
+
+        switch (input) {
+            case 1:
+                for (int i = 0; i < closest_stops.size(); ++i) possible_inputs_selection.push_back(i);
+                cout << "(0 to " + to_string(closest_stops.size()-1)+")";
+                input_sub = getUserInput(possible_inputs_selection);
+                selectStop(closest_stops[input_sub].first);
+                clearScreen();
+                mainMenu(1);
+                break;
+            case 2:
+                clearScreen();
+                mainMenu(1);
+                break;
+            case 0:
+                exit(0);
+            default:
+                break;
+        }
+    }
+}
+
+
 void AdminMenu::selectStop(Stop *stop) {
     auto hashTable = data.getStopCodes();
     int index = hashTable.find(stop->getCode())->second;
@@ -314,6 +447,7 @@ string AdminMenu::getUserTextInput(const vector<string>& possible_inputs) {
     getline(cin, input);
     if (cin.fail()) cout << "deez";
     bool found = false;
+    if (possible_inputs.size() == 0) found = true;
     for (const string& my_string: possible_inputs){
         if (my_string == input) found = true;
     }
@@ -329,6 +463,7 @@ string AdminMenu::getUserTextInput(const vector<string>& possible_inputs) {
         for (const string &my_string: possible_inputs) {
             if (my_string == input)found = true;
         }
+        if (possible_inputs.size() == 0) found = true;
     }
     return input;
 }
