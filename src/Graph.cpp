@@ -60,6 +60,7 @@ vector<int> Graph::bfsPathSearch(int src, int dest) {
                         path.push_back(predecessor[crawl]);
                         crawl = predecessor[crawl];
                     }
+                    reverse(path.begin(), path.end());
                     return path;
                 }
             }
@@ -109,6 +110,7 @@ int Graph::dijkstra(int orig, int dest) const{
 }
 
 list<string> Graph::determineLineChanges(vector<int> path) {
+    //TODO ATUALIZAR FAZER MANEIRA RECURSIVA A VER TODAS AS POSSIBILIDADES
     list<string> lines_used;
     string current_line = ""; //line being used
     bool found_same_line = false;
@@ -132,6 +134,16 @@ list<string> Graph::determineLineChanges(vector<int> path) {
         }
     }
     return lines_used;
+}
+
+double Graph::determineDistanceTraveled(const vector<int>& path){
+    double distance;
+    for (int i=0; i<path.size()-1;i++){
+        auto node1 = nodes[path[i]].stop;
+        auto node2 = nodes[path[i+1]].stop;
+        distance+=haversine(node1.getLatitude(), node1.getLongitude(), node2.getLatitude(), node2.getLongitude());
+    }
+    return distance;
 }
 
 double Graph::haversine(double lat1, double lon1, double lat2, double lon2){

@@ -4,6 +4,10 @@
 #include "src/LoadData.h"
 #include "src/AdminMenu.h"
 
+void test(){
+
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc, argv);
 

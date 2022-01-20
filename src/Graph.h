@@ -37,6 +37,7 @@ public:
     void addEdge(int src, int dest, string  = "");
     void dfs(int v);
     vector<int> bfsPathSearch(int src, int dest);
+    double determineDistanceTraveled(const vector<int>& path);
     int outDegree(int v);
     int connectedComponents();
     int giantComponent();

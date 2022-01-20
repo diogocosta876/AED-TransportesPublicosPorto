@@ -10,8 +10,8 @@ AdminMenu::AdminMenu(LoadData data): data(std::move(data)){}
 
 void AdminMenu::mainMenu(int page_counter) {
     //For faster development //TODO REMOVE PATH DEBUGGING SCREEN
-    selectedStopID_origin = 233;
-    selectedStopID_destination = 215;
+    selectedStopID_origin = 215;
+    selectedStopID_destination = 234;
 
     //Checks if stops have already been selected
     if(selectedStopID_origin != -1 && selectedStopID_destination != -1) tripMenu();
@@ -246,12 +246,12 @@ void AdminMenu::pathMenu(vector<int> path, int path_distance) {
     //Table Line Separator
     for (int i = 0; i < table_length; ++i) cout << "-"; cout << "\n";
 
-    list<string> lines_used = data.getGraph().determineLineChanges(path);
-    double distance_traveled = determineDistanceTraveled(path);
+    //list<string> lines_used = data.getGraph().determineLineChanges(path);
+    double distance_traveled = data.getGraph().determineDistanceTraveled(path);
     cout << "Stop Count: " << path.size() << endl;
-    cout << "Lines Used: ";
-    for (string line: lines_used){ cout << line << " ";}
-    cout << "\nDistance Traveled: " << "NOT IMPLEMENTED" << endl;
+    cout << "Lines Used: NOT IMPLEMENTED";
+    //for (string line: lines_used){ cout << line << " ";}
+    cout << "\nDistance Traveled: " << distance_traveled << endl;
 
     cout << "\n";
     cout << "\tAdmin Menu\n";
@@ -285,11 +285,6 @@ void AdminMenu::selectStop(Stop *stop) {
     int index = hashTable.find(stop->getCode())->second;
     if (selectedStopID_origin == -1) selectedStopID_origin = index;
     else selectedStopID_destination = index;
-}
-
-
-double AdminMenu::determineDistanceTraveled(vector<int> path) {
-    return 0;
 }
 
 int AdminMenu::getUserInput(const vector<int>& inputs) {
