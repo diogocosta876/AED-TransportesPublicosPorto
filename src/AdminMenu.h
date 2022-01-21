@@ -17,7 +17,7 @@ private:
     void selectStopByLocationMenu(bool userInsertedLocation = false, double lat = -INT_MAX, double lon=-INT_MAX);
     void lineMenu(Line* line);
     void tripMenu();
-    void pathMenu(vector<int> path, int path_distance = -1);
+    void pathMenu(vector<int> path, double path_distance = -1, vector<string> lines = {{}});
     static int getUserInput(const vector<int>& inputs);
     static string getUserTextInput(const vector<string>& possible_inputs = {});
     static void printInTable(const string &s, int linelength);

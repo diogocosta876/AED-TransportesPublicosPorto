@@ -12,6 +12,7 @@
 #include <iostream>
 #include <algorithm>
 #include "cmath"
+#include <set>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ class Graph {
         Node(Stop stop): stop(std::move(stop)){}
     };
 
-    int n;              // Graph size (vertices are numbered from 1 to n)
+    int n;              // Graph size (vertices are numbered from 0 to n-1)
     vector<Node> nodes; // The list of nodes being represented
 
 public:
@@ -48,8 +49,12 @@ public:
     list<string> determineLineChanges(vector<int> path);
     static double haversine(double lat1, double lon1, double lat2, double lon2);
     void debug_displayEdges() const;
-    int dijkstra(int orig, int dest) const;
+    pair<pair<vector<int>, int>, vector<string>> dijkstra_path(int a, int b);
+    /*pair<pair<vector<int>, int>, vector<string>> minimumStopsPath(int a, int b);*/
+    void dijkstra(int s, vector<double>& dist, vector<int>& pred, vector<vector<string>>& lines);
 
+    vector<pair<int, string>> determineLessLineChangesPath(int s, int d);
+    void printAllPathsUtil(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string line);
 };
 
 #endif

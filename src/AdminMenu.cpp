@@ -9,8 +9,8 @@ AdminMenu::AdminMenu(LoadData data): data(std::move(data)){}
 
 void AdminMenu::mainMenu(int page_counter) {
     //For faster development //TODO REMOVE PATH DEBUGGING SCREEN
-    //selectedStopID_origin = 215;
-    //selectedStopID_destination = 234;
+    selectedStopID_origin = 215;
+    selectedStopID_destination = 234;
 
     //Checks if stops have already been selected
     if(selectedStopID_origin != -1 && selectedStopID_destination != -1) tripMenu();
@@ -196,19 +196,31 @@ void AdminMenu::tripMenu() {
     input = getUserInput(possible_inputs);
 
     switch (input) {
-        case 1:
+        case 1: {
             //TODO SHORTEST PATH (DIJKSTRA)
-            data.getGraph().dijkstra(selectedStopID_origin, selectedStopID_destination);
+            auto path_data = data.getGraph().dijkstra_path(selectedStopID_origin, selectedStopID_destination);
+            pathMenu(path_data.first.first, path_data.first.second, path_data.second);
             break;
+        }
         case 2: {
             //TODO PATH WITH LESS STOPS (PESQUISA EM LARGURA BFS)
             vector<int> path = data.getGraph().bfsPathSearch(selectedStopID_origin, selectedStopID_destination);
             pathMenu(path);
             break;
         }
-        case 3:
+        case 3: {
             //TODO PATH WITH LESS LINE CHANGES
+            auto path_data = data.getGraph().determineLessLineChangesPath(selectedStopID_origin, selectedStopID_destination);
+            vector<int> path;
+            vector<string> lines;
+            for (pair<int, string> stop: path_data){
+                path.push_back(stop.first);
+                if (find(lines.begin(), lines.end(), stop.second) == lines.end())
+                    lines.push_back(stop.second);
+            }
+            pathMenu(path, -1, lines);
             break;
+        }
         case 4:
             //TODO CHEAPEST PATH (LESS ZONES)
             break;
@@ -229,7 +241,7 @@ void AdminMenu::tripMenu() {
     }
 }
 
-void AdminMenu::pathMenu(vector<int> path, int path_distance) {
+void AdminMenu::pathMenu(vector<int> path, double path_distance, vector<string> lines) {
     printTitle();
 
     int table_length = 57;
@@ -256,11 +268,13 @@ void AdminMenu::pathMenu(vector<int> path, int path_distance) {
     for (int i = 0; i < table_length; ++i) cout << "-"; cout << "\n";
 
     //list<string> lines_used = data.getGraph().determineLineChanges(path);
-    double distance_traveled = data.getGraph().determineDistanceTraveled(path);
+    if (path_distance == -1) path_distance = data.getGraph().determineDistanceTraveled(path);
     cout << "Stop Count: " << path.size() << endl;
-    cout << "Lines Used: NOT IMPLEMENTED";
-    //for (string line: lines_used){ cout << line << " ";}
-    cout << "\nDistance Traveled: " << distance_traveled << endl;
+    cout << "Lines Used:";
+    for (auto line: lines)
+        cout << line << " ";
+
+    cout << "\nDistance Traveled: " << path_distance << endl;
 
     cout << "\n";
     cout << "\tAdmin Menu\n";
@@ -343,7 +357,7 @@ void AdminMenu::selectStopByLocationMenu(bool userInsertedLocation, double lat, 
                     closest_stops.push_back(mypair);
                 else {
                     closest_stops[4] = mypair;
-                    min_dist = closest_stops[4].second;
+                    min_dist = closest_stops[3].second;
                 }
             }
         }

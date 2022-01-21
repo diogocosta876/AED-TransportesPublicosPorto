@@ -29,6 +29,138 @@ void Graph::dfs(int v) {
     }
 }
 
+pair<pair<vector<int>, int>, vector<string>> Graph::dijkstra_path(int a, int b) {
+    vector<double> dist;
+    vector<int> pred;
+    vector<vector<string>> lines;
+    pair<pair<vector<int>, int>, vector<string>> mypair;
+    dijkstra(a, dist, pred, lines);
+    vector<int> path;
+    mypair.first.first = path;
+    mypair.first.second = -1;
+    mypair.second = lines[b];
+    if (dist[b] == INT_MAX) return mypair;
+    path.push_back(b);
+    int v = b;
+    while (v != a) {
+        v = pred[v];
+        path.push_back(v);
+    }
+    reverse(path.begin(), path.end());
+    mypair.first.first = path;
+    mypair.first.second = dist[b];
+    mypair.second = lines[b];
+    return mypair;
+}
+
+vector<pair<int, string>> Graph::determineLessLineChangesPath(int s, int d)
+{
+    // Mark all the vertices as not visited
+    bool* visited = new bool[n];
+
+    // Create an array to store paths
+    vector<pair<int, string>> path;
+    vector<vector<pair<int, string>>> path_store;
+
+    // Initialize all vertices as not visited
+    for (int i = 0; i < n; i++)
+        visited[i] = false;
+
+    // Call the recursive helper function to print all paths
+    printAllPathsUtil(s, d, visited, path, path_store, "");
+
+    int min = INT_MAX;
+    vector<pair<int, string>> min_path;
+    vector<string> line_counter;
+    for (vector<pair<int, string>> path: path_store){
+        line_counter.clear();
+        for (pair<int, string> stop: path){
+            if (find(line_counter.begin(), line_counter.end(), stop.second) == line_counter.end())
+                line_counter.push_back(stop.second);
+        }
+        if (line_counter.size() < min){
+            min = line_counter.size();
+            min_path = path;
+        }
+        cout << endl << "LINE COUNTER: ";
+        for (auto st: line_counter) cout << st << " ";
+    }
+    return min_path;
+
+}
+
+// A recursive function to print all paths from 'u' to 'd'.
+// visited[] keeps track of vertices in current path.
+// path[] stores actual vertices and path_index is current
+// index in path[]
+void Graph::printAllPathsUtil(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string line)
+{
+    // Mark the current node and store it in path[]
+    visited[u] = true;
+    pair<int, string> mypair;
+    mypair.first = u;
+    mypair.second = line;
+    path.push_back(mypair);
+
+    // If current vertex is same as destination, then print
+    if (path.size() > 30) return;
+
+    if (u == d) {
+        for (int i = 0; i < path.size(); i++)
+            cout << path[i].first << " line:" << path[i].second << "  ";
+            path_store.push_back(path);
+        cout << endl;
+    }
+
+    else // If current vertex is not destination
+    {
+        // Recur for all the vertices adjacent to current vertex
+        list<int>::iterator i; queue<int> q;
+        for (auto edge: nodes[u].adj)
+            if (!visited[edge.dest]) {
+                printAllPathsUtil(edge.dest, d, visited, path, path_store, edge.lineCode);
+            }
+    }
+
+    // Remove current vertex from path[] and mark it as unvisited
+    visited[u] = false;
+}
+
+
+
+//Dijkstra in O(|E| log |V|) using only STL and sets
+void Graph::dijkstra(int s, vector<double>& dist, vector<int>& pred, vector<vector<string>>& lines) {
+    set<pair<int, int>> q;
+    for (int v=0; v<n; v++) {
+        dist.push_back(INT_MAX);
+        pred.push_back(-1);
+        lines.push_back(vector<string> {""});
+        q.insert({INT_MAX, v});
+        nodes[v].visited = false;
+    }
+    dist[s] = 0;
+    q.erase({INT_MAX, s});
+    q.insert({0, s});
+    pred[s] = s;
+    while (q.size()>0) {
+        int u = q.begin()->second;
+        q.erase(q.begin());
+        cout << "Node " << nodes[u].stop.getCode() << " dist = " << dist[u] << " lines:"; for (auto line: lines[u]) cout << line << " ";
+        cout << "\n";
+        nodes[u].visited = true;
+        for (auto current_edge : nodes[u].adj) {
+            int next = current_edge.dest;
+            if (!nodes[next].visited && dist[u] + current_edge.weight < dist[next]) {
+                q.erase({dist[next], next});
+                dist[next] = dist[u] + current_edge.weight;
+                pred[next] = u;
+                lines[next] = lines[u]; lines[next].push_back(current_edge.lineCode);
+                q.insert({dist[next], next});
+            }
+        }
+    }
+}
+
 // Breadth-First Search
 vector<int> Graph::bfsPathSearch(int src, int dest) {
     vector<int> path;
@@ -102,11 +234,6 @@ int Graph::diameter() {
 
 bool Graph::hasCycle() {
     return false;
-}
-
-int Graph::dijkstra(int orig, int dest) const{
-    //TODO dijkstra
-    return 1;
 }
 
 list<string> Graph::determineLineChanges(vector<int> path) {
