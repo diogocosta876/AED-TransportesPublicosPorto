@@ -34,27 +34,25 @@ class Graph {
 
 public:
     explicit Graph(const vector<Stop*>& stops);
-    Graph(int n);
     void addEdge(int src, int dest, string  = "");
-    void dfs(int v);
-    vector<int> bfsPathSearch(int src, int dest);
-    double determineDistanceTraveled(const vector<int>& path);
-    int outDegree(int v);
-    int connectedComponents();
-    int giantComponent();
-    list<int> topologicalSorting();
-    int distance(int a, int b);
-    int diameter();
-    bool hasCycle();
-    list<string> determineLineChanges(vector<int> path);
-    static double haversine(double lat1, double lon1, double lat2, double lon2);
-    void debug_displayEdges() const;
-    pair<pair<vector<int>, int>, vector<string>> dijkstra_path(int a, int b);
-    /*pair<pair<vector<int>, int>, vector<string>> minimumStopsPath(int a, int b);*/
+
+    //Dijkstra in O(|E| log |V|) using only STL and sets, to determine the shortest path
+    pair<pair<vector<int>, double>, vector<string>> dijkstra_util(int a, int b);
     void dijkstra(int s, vector<double>& dist, vector<int>& pred, vector<vector<string>>& lines);
 
+    // Breadth-First Search to determine the path that crosses less stops
+    vector<int> bfsPathSearch(int src, int dest);
+
+    void determineLessLineChangesPath_util(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string line);
+    void determineLessZonesCrossedPath_util(int u, int d, bool *visited, vector<pair<int, string>> &path, vector<vector<pair<int, string>>> &path_store, string zone);
     vector<pair<int, string>> determineLessLineChangesPath(int s, int d);
-    void printAllPathsUtil(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string line);
+    vector<pair<int, string>> determineLessZonesCrossedPath(int s, int d);
+
+    double determineDistanceTraveled(const vector<int>& path);
+    list<string> determineLineChanges(vector<int> path);
+    static double haversine(double lat1, double lon1, double lat2, double lon2);
+
+    void debug_displayEdges() const;
 };
 
 #endif

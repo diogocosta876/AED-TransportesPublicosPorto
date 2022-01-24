@@ -19,9 +19,9 @@ int main(int argc, char* argv[]) {
 
     if (debug_LoadData){
         data.debug_displayEdges();
-        data.displayLines();
-        data.displayStopCodes();
-        data.displayStops();
+        data.debug_displayLines();
+        data.debug_displayStopCodes();
+        data.debug_displayStops();
     }
     menu.mainMenu();
 

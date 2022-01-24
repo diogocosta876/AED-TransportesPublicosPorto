@@ -4,16 +4,18 @@
 
 using namespace std;
 
-LoadData::LoadData(): graph(vector<Stop*>{}) {
+LoadData::LoadData(double walking_distance): graph(vector<Stop*>{}) {
     loadStops();
     loadLines();
     buildGraph();
+    this->walking_distance = walking_distance;
 }
 
 void LoadData::loadStops() {
     string textLine;
     ifstream MyReadFile("../data/Stops.csv");
 
+    //Load Stops into a vector to then build the graph in buildGraph()
     string code, name, zone, aux;
     double latitude, longitude;
     int counter = 0;
@@ -39,6 +41,7 @@ void LoadData::loadLines() {
     string textLine;
     ifstream MyReadFile("../data/Lines.csv");
 
+    // load lines into a vector to then build the graph in buildGraph()
     string code, name;
     getline(MyReadFile, textLine);
     while (getline (MyReadFile, textLine)) {
@@ -62,6 +65,7 @@ void LoadData::loadLines() {
 void LoadData::buildGraph() {
     graph = Graph(stops);
 
+    //Use Lines and Stops vectors to build the graph
     for(int i=0; i<=1; i++) {
         for (Line* line: lines) {
             string name = line->getCode();
@@ -79,41 +83,22 @@ void LoadData::buildGraph() {
                 id1 = id2;
                 counter--;
             }
+        }
+    }
 
-            getline(ReadLinePath, textLine);
-            while (getline(ReadLinePath, textLine)) {
-
+    // Add edges based on the walking_distance variable
+    for(pair<string, int> stop1_data: stopCodes){
+        for(pair<string, int> stop2_data: stopCodes){
+            if (stop1_data.second != stop2_data.second && getDistance(*stops[stop1_data.second], *stops[stop2_data.second]) <= walking_distance){
+                graph.addEdge(stop1_data.second, stop2_data.second, "WALK");
+                graph.addEdge(stop2_data.second, stop1_data.second, "WALK");
             }
         }
     }
 }
 
-void LoadData::displayStops() const {
-    cout << "Examples Stops:\n";
-    for (int i= 0; i<5; i++){
-        cout << stops[i]->getCode() << endl;
-    }
-}
-void LoadData::displayLines() const {
-    cout << "Examples lines:\n";
-    for (int i=0;i<5;i++){
-        cout << lines[i]->getCode() << endl;
-    }
-}
-
-void LoadData::displayStopCodes() const {
-    cout << "Examples StopCodes:\n";
-    int counter = 0;
-    auto it=stopCodes.begin();
-    while(counter<5){
-        cout << it->first << " " << it->second << endl;
-        counter++;
-        it++;
-    }
-}
-
-void LoadData::debug_displayEdges() const {
-    graph.debug_displayEdges();
+double LoadData::getDistance(const Stop& a, const Stop& b) {
+    return Graph::haversine(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude());
 }
 
 Graph& LoadData::getGraph() {
@@ -131,3 +116,40 @@ vector<Line*>& LoadData::getLines() {
 map<string, int>& LoadData::getStopCodes() {
     return stopCodes;
 }
+
+double LoadData::getWalkingDistance() const {
+    return walking_distance;
+}
+
+void LoadData::setWalkingDistance(double walkingDistance) {
+    walking_distance = walkingDistance;
+}
+
+void LoadData::debug_displayStops() const {
+    cout << "Examples Stops:\n";
+    for (int i= 0; i<5; i++){
+        cout << stops[i]->getCode() << endl;
+    }
+}
+void LoadData::debug_displayLines() const {
+    cout << "Examples lines:\n";
+    for (int i=0;i<5;i++){
+        cout << lines[i]->getCode() << endl;
+    }
+}
+
+void LoadData::debug_displayStopCodes() const {
+    cout << "Examples StopCodes:\n";
+    int counter = 0;
+    auto it=stopCodes.begin();
+    while(counter<5){
+        cout << it->first << " " << it->second << endl;
+        counter++;
+        it++;
+    }
+}
+
+void LoadData::debug_displayEdges() const {
+    graph.debug_displayEdges();
+}
+

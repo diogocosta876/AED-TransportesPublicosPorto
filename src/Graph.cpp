@@ -3,37 +3,28 @@
 
 #include "Graph.h"
 
+#include <utility>
+
 // Constructor: nr nodes and direction (default: undirected)
 Graph::Graph(const vector<Stop*>& stops) {
-    n = stops.size();
+    n = static_cast<int>(stops.size());
     for(Stop* stop : stops){
         nodes.emplace_back(*stop);
     }
 }
-
 void Graph::addEdge(int src, int dest, string lineCode) {
     if (src<0 || src>n || dest<0 || dest>n) return;
     Node node1 = nodes[src]; Node node2 = nodes[dest];
     double weight = haversine(node1.stop.getLatitude(), node1.stop.getLongitude(), node2.stop.getLatitude(), node2.stop.getLongitude());
-    nodes[src].adj.push_back({dest, weight, lineCode});
+    nodes[src].adj.push_back({dest, weight, std::move(lineCode)});
 }
 
-// Depth-First Search: modified implementation to get the shortest path in unweighted graphs
-void Graph::dfs(int v) {
-    cout << v << " "; // show node order
-    nodes[v].visited = true;
-    for (auto e : nodes[v].adj) {
-        int w = e.dest;
-        if (!nodes[w].visited)
-            dfs(w);
-    }
-}
-
-pair<pair<vector<int>, int>, vector<string>> Graph::dijkstra_path(int a, int b) {
+//Dijkstra in O(|E| log |V|) using only STL and sets, to determine the shortest path
+pair<pair<vector<int>, double>, vector<string>> Graph::dijkstra_util(int a, int b) {
     vector<double> dist;
     vector<int> pred;
     vector<vector<string>> lines;
-    pair<pair<vector<int>, int>, vector<string>> mypair;
+    pair<pair<vector<int>, double>, vector<string>> mypair;
     dijkstra(a, dist, pred, lines);
     vector<int> path;
     mypair.first.first = path;
@@ -52,83 +43,6 @@ pair<pair<vector<int>, int>, vector<string>> Graph::dijkstra_path(int a, int b) 
     mypair.second = lines[b];
     return mypair;
 }
-
-vector<pair<int, string>> Graph::determineLessLineChangesPath(int s, int d)
-{
-    // Mark all the vertices as not visited
-    bool* visited = new bool[n];
-
-    // Create an array to store paths
-    vector<pair<int, string>> path;
-    vector<vector<pair<int, string>>> path_store;
-
-    // Initialize all vertices as not visited
-    for (int i = 0; i < n; i++)
-        visited[i] = false;
-
-    // Call the recursive helper function to print all paths
-    printAllPathsUtil(s, d, visited, path, path_store, "");
-
-    int min = INT_MAX;
-    vector<pair<int, string>> min_path;
-    vector<string> line_counter;
-    for (vector<pair<int, string>> path: path_store){
-        line_counter.clear();
-        for (pair<int, string> stop: path){
-            if (find(line_counter.begin(), line_counter.end(), stop.second) == line_counter.end())
-                line_counter.push_back(stop.second);
-        }
-        if (line_counter.size() < min){
-            min = line_counter.size();
-            min_path = path;
-        }
-        cout << endl << "LINE COUNTER: ";
-        for (auto st: line_counter) cout << st << " ";
-    }
-    return min_path;
-
-}
-
-// A recursive function to print all paths from 'u' to 'd'.
-// visited[] keeps track of vertices in current path.
-// path[] stores actual vertices and path_index is current
-// index in path[]
-void Graph::printAllPathsUtil(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string line)
-{
-    // Mark the current node and store it in path[]
-    visited[u] = true;
-    pair<int, string> mypair;
-    mypair.first = u;
-    mypair.second = line;
-    path.push_back(mypair);
-
-    // If current vertex is same as destination, then print
-    if (path.size() > 30) return;
-
-    if (u == d) {
-        for (int i = 0; i < path.size(); i++)
-            cout << path[i].first << " line:" << path[i].second << "  ";
-            path_store.push_back(path);
-        cout << endl;
-    }
-
-    else // If current vertex is not destination
-    {
-        // Recur for all the vertices adjacent to current vertex
-        list<int>::iterator i; queue<int> q;
-        for (auto edge: nodes[u].adj)
-            if (!visited[edge.dest]) {
-                printAllPathsUtil(edge.dest, d, visited, path, path_store, edge.lineCode);
-            }
-    }
-
-    // Remove current vertex from path[] and mark it as unvisited
-    visited[u] = false;
-}
-
-
-
-//Dijkstra in O(|E| log |V|) using only STL and sets
 void Graph::dijkstra(int s, vector<double>& dist, vector<int>& pred, vector<vector<string>>& lines) {
     set<pair<int, int>> q;
     for (int v=0; v<n; v++) {
@@ -142,13 +56,13 @@ void Graph::dijkstra(int s, vector<double>& dist, vector<int>& pred, vector<vect
     q.erase({INT_MAX, s});
     q.insert({0, s});
     pred[s] = s;
-    while (q.size()>0) {
+    while (!q.empty()) {
         int u = q.begin()->second;
         q.erase(q.begin());
-        cout << "Node " << nodes[u].stop.getCode() << " dist = " << dist[u] << " lines:"; for (auto line: lines[u]) cout << line << " ";
-        cout << "\n";
+        //cout << "Node " << nodes[u].stop.getCode() << " dist = " << dist[u] << " lines:"; for (auto line: lines[u]) cout << line << " ";
+        //cout << "\n";
         nodes[u].visited = true;
-        for (auto current_edge : nodes[u].adj) {
+        for (const auto& current_edge : nodes[u].adj) {
             int next = current_edge.dest;
             if (!nodes[next].visited && dist[u] + current_edge.weight < dist[next]) {
                 q.erase({dist[next], next});
@@ -161,7 +75,7 @@ void Graph::dijkstra(int s, vector<double>& dist, vector<int>& pred, vector<vect
     }
 }
 
-// Breadth-First Search
+// Breadth-First Search to determine the path that crosses less stops
 vector<int> Graph::bfsPathSearch(int src, int dest) {
     vector<int> path;
     int predecessor[n]; int dist[n];
@@ -176,7 +90,7 @@ vector<int> Graph::bfsPathSearch(int src, int dest) {
     dist[src] = 0;
     while (!q.empty()) { // while there are still unvisited nodes
         int a = q.front(); q.pop();
-        for (auto e : nodes[a].adj) {
+        for (const auto& e : nodes[a].adj) {
             int a_dest = e.dest;
             if (!nodes[a_dest].visited) {
                 q.push(a_dest);
@@ -201,46 +115,142 @@ vector<int> Graph::bfsPathSearch(int src, int dest) {
     return path;
 }
 
+void Graph::determineLessLineChangesPath_util(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string line)
+{
+    // Mark the current node and store it in path[]
+    visited[u] = true;
+    pair<int, string> mypair;
+    mypair.first = u;
+    mypair.second = std::move(line);
+    path.push_back(mypair);
 
-int Graph::outDegree(int v) {
-    if(v < 1 || v > n) return -1;
-    else return nodes[v].adj.size();
+    // If current vertex is same as destination, then print
+    if (path.size() > 30) return;
+
+    if (u == d) {
+        //for (int i = 0; i < path.size(); i++)
+        //    cout << path[i].first << " line:" << path[i].second << "  ";
+        path_store.push_back(path);
+        cout << endl;
+    }
+
+    else // If current vertex is not destination
+    {
+        // Recur for all the vertices adjacent to current vertex
+        list<int>::iterator i; queue<int> q;
+        for (const auto& edge: nodes[u].adj)
+            if (!visited[edge.dest]) {
+                determineLessLineChangesPath_util(edge.dest, d, visited, path, path_store, edge.lineCode);
+            }
+    }
+
+    // Remove current vertex from path[] and mark it as unvisited
+    visited[u] = false;
 }
+void Graph::determineLessZonesCrossedPath_util(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string zone){
 
+    // Mark the current node and store it in path[]
+    visited[u] = true;
+    pair<int, string> mypair;
+    mypair.first = u;
+    mypair.second = std::move(zone);
+    path.push_back(mypair);
 
-int Graph::connectedComponents() {
-    int counter = 0;
-    for (int v=1; v<=n; v++) nodes[v].visited = false;
-    return 0;
+    // If current vertex is same as destination, then print
+    if (path.size() > 30) return;
+
+    if (u == d) {
+        //for (int i = 0; i < path.size(); i++)
+        //   cout << path[i].first << " line:" << path[i].second << "  ";
+        path_store.push_back(path);
+        cout << endl;
+    }
+
+    else // If current vertex is not destination
+    {
+        // Recur for all the vertices adjacent to current vertex
+        list<int>::iterator i; queue<int> q;
+        for (const auto& edge: nodes[u].adj)
+            if (!visited[edge.dest]) {
+                determineLessZonesCrossedPath_util(edge.dest, d, visited, path, path_store, nodes[edge.dest].stop.getZone());
+            }
+    }
+
+    // Remove current vertex from path[] and mark it as unvisited
+    visited[u] = false;
 }
+vector<pair<int, string>> Graph::determineLessLineChangesPath(int s, int d){
+    // Mark all the vertices as not visited
+    bool* visited = new bool[n];
 
-int Graph::giantComponent() {
-    return 0;
+    // Create an array to store paths
+    vector<pair<int, string>> path;
+    vector<vector<pair<int, string>>> path_store;
+
+    // Initialize all vertices as not visited
+    for (int i = 0; i < n; i++)
+        visited[i] = false;
+
+    // Call the recursive helper function to print all paths
+    determineLessLineChangesPath_util(s, d, visited, path, path_store, "");
+
+    int min = INT_MAX;
+    vector<pair<int, string>> min_path;
+    vector<string> line_counter;
+    for (const vector<pair<int, string>>& a_path: path_store){
+        line_counter.clear();
+        for (const pair<int, string>& stop: a_path){
+            if (find(line_counter.begin(), line_counter.end(), stop.second) == line_counter.end())
+                line_counter.push_back(stop.second);
+        }
+        if (line_counter.size() < min){
+            min = static_cast<int>(line_counter.size());
+            min_path = a_path;
+        }
+        //cout << endl << "LINE COUNTER: ";
+        //for (auto st: line_counter) cout << st << " ";
+    }
+    return min_path;
 }
+vector<pair<int, string>> Graph::determineLessZonesCrossedPath(int s, int d)
+{
+    // Mark all the vertices as not visited
+    bool* visited = new bool[n];
 
+    // Create an array to store paths
+    vector<pair<int, string>> path;
+    vector<vector<pair<int, string>>> path_store;
 
-list<int> Graph::topologicalSorting() {
-    list<int> order;
-    return order;
-}
+    // Initialize all vertices as not visited
+    for (int i = 0; i < n; i++)
+        visited[i] = false;
 
-int Graph::distance(int a, int b) {
-    return 0;
-}
+    // Call the recursive helper function to print all paths
+    determineLessZonesCrossedPath_util(s, d, visited, path, path_store, "");
 
-int Graph::diameter() {
-    return 0;
-}
-
-bool Graph::hasCycle() {
-    return false;
+    int min = INT_MAX;
+    vector<pair<int, string>> min_path;
+    vector<string> zone_counter;
+    for (const vector<pair<int, string>>& a_path: path_store){
+        zone_counter.clear();
+        for (const pair<int, string>& stop: a_path){
+            if (find(zone_counter.begin(), zone_counter.end(), stop.second) == zone_counter.end())
+                zone_counter.push_back(stop.second);
+        }
+        if (zone_counter.size() < min){
+            min = static_cast<int>(zone_counter.size());
+            min_path = a_path;
+        }
+        cout << endl << "ZONE COUNTER: ";
+        for (const auto& st: zone_counter) cout << st << " ";
+    }
+    return min_path;
 }
 
 list<string> Graph::determineLineChanges(vector<int> path) {
-    //TODO ATUALIZAR FAZER MANEIRA RECURSIVA A VER TODAS AS POSSIBILIDADES
     list<string> lines_used;
-    string current_line = ""; //line being used
-    bool found_same_line = false;
+    string current_line; //line being used
+    bool found_same_line;
     for (int i = 0; i<path.size();i++){
         found_same_line = false;
         //find edge that connects stopID and stopID+1 from path, then see if the line is alreay registed
@@ -262,9 +272,8 @@ list<string> Graph::determineLineChanges(vector<int> path) {
     }
     return lines_used;
 }
-
 double Graph::determineDistanceTraveled(const vector<int>& path){
-    double distance;
+    double distance = 0;
     for (int i=0; i<path.size()-1;i++){
         auto node1 = nodes[path[i]].stop;
         auto node2 = nodes[path[i+1]].stop;
@@ -272,7 +281,6 @@ double Graph::determineDistanceTraveled(const vector<int>& path){
     }
     return distance;
 }
-
 double Graph::haversine(double lat1, double lon1, double lat2, double lon2){
     // distance between latitudes
     // and longitudes
@@ -293,16 +301,14 @@ double Graph::haversine(double lat1, double lon1, double lat2, double lon2){
     double c = 2 * asin(sqrt(a));
     return rad * c;
 }
-
-
 void Graph::debug_displayEdges() const {
     int counter = 0;
-    for (Node node: nodes){
+    for (const Node& node: nodes){
         if (counter > 5) break;
         if (!node.adj.empty()){
             counter++;
             cout << "edges detected\n";
-            for (Edge edge: node.adj){
+            for (const Edge& edge: node.adj){
                 cout << "dest: " << edge.dest << " distance: " << edge.weight << endl;
             }
         }
