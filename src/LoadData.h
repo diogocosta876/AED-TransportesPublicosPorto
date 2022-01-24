@@ -25,7 +25,7 @@ public:
      * @param walking_distance inteiro que define a distância máxima entre paragens para poderem
      * ser conectadas no grafo simulando caminho pedestre
      */
-    explicit LoadData(double walking_distance = 0.5);
+    explicit LoadData(double walking_distance = 0.1);
     /** Getter do atributo graph */
     Graph& getGraph();
     /** Getter do atributo stops */

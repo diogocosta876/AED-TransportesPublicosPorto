@@ -115,33 +115,39 @@ vector<int> Graph::bfsPathSearch(int src, int dest) {
     return path;
 }
 
-void Graph::determineLessLineChangesPath_util(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string line)
+void Graph::determineLessLineChangesPath_util(int u, int d, bool visited[], vector<pair<int, string>> path, vector<vector<pair<int, string>>>& path_store, string line)
 {
     // Mark the current node and store it in path[]
     visited[u] = true;
     pair<int, string> mypair;
     mypair.first = u;
-    mypair.second = std::move(line);
+    mypair.second = line;
     path.push_back(mypair);
 
     // If current vertex is same as destination, then print
-    if (path.size() > 30) return;
+    if (path.size() > 5) {
+        visited[u] = false;
+        return;
+    }
 
     if (u == d) {
-        //for (int i = 0; i < path.size(); i++)
-        //    cout << path[i].first << " line:" << path[i].second << "  ";
+        //FOR VISUALIZATION OF THE PATHS ITERATED
+        /*
+        for (int i = 0; i < path.size(); i++)
+            cout << path[i].first << " line:" << path[i].second << "  ";
+        cout << "\n";
+         */
         path_store.push_back(path);
-        cout << endl;
     }
 
     else // If current vertex is not destination
     {
         // Recur for all the vertices adjacent to current vertex
-        list<int>::iterator i; queue<int> q;
-        for (const auto& edge: nodes[u].adj)
-            if (!visited[edge.dest]) {
+        list<int>::iterator i;
+        queue<int> q;
+        for (auto edge: nodes[u].adj)
+            if (!visited[edge.dest])
                 determineLessLineChangesPath_util(edge.dest, d, visited, path, path_store, edge.lineCode);
-            }
     }
 
     // Remove current vertex from path[] and mark it as unvisited
@@ -153,27 +159,27 @@ void Graph::determineLessZonesCrossedPath_util(int u, int d, bool visited[], vec
     visited[u] = true;
     pair<int, string> mypair;
     mypair.first = u;
-    mypair.second = std::move(zone);
+    mypair.second = zone;
     path.push_back(mypair);
 
     // If current vertex is same as destination, then print
-    if (path.size() > 30) return;
+    if (path.size() > 6) {
+        visited[u] = false;
+        return;
+    }
 
     if (u == d) {
-        //for (int i = 0; i < path.size(); i++)
-        //   cout << path[i].first << " line:" << path[i].second << "  ";
         path_store.push_back(path);
-        cout << endl;
     }
 
     else // If current vertex is not destination
     {
         // Recur for all the vertices adjacent to current vertex
-        list<int>::iterator i; queue<int> q;
-        for (const auto& edge: nodes[u].adj)
-            if (!visited[edge.dest]) {
-                determineLessZonesCrossedPath_util(edge.dest, d, visited, path, path_store, nodes[edge.dest].stop.getZone());
-            }
+        list<int>::iterator i;
+        queue<int> q;
+        for (auto edge: nodes[u].adj)
+            if (!visited[edge.dest])
+                determineLessLineChangesPath_util(edge.dest, d, visited, path, path_store, nodes[edge.dest].stop.getZone());
     }
 
     // Remove current vertex from path[] and mark it as unvisited
@@ -191,11 +197,12 @@ vector<pair<int, string>> Graph::determineLessLineChangesPath(int s, int d){
     for (int i = 0; i < n; i++)
         visited[i] = false;
 
-    // Call the recursive helper function to print all paths
+    // Call the recursive helper function to recursively iterate all paths
     determineLessLineChangesPath_util(s, d, visited, path, path_store, "");
 
     int min = INT_MAX;
     vector<pair<int, string>> min_path;
+    int min_path_size = INT_MAX;
     vector<string> line_counter;
     for (const vector<pair<int, string>>& a_path: path_store){
         line_counter.clear();
@@ -203,9 +210,10 @@ vector<pair<int, string>> Graph::determineLessLineChangesPath(int s, int d){
             if (find(line_counter.begin(), line_counter.end(), stop.second) == line_counter.end())
                 line_counter.push_back(stop.second);
         }
-        if (line_counter.size() < min){
+        if (line_counter.size() < min || (a_path.size() < min_path_size && line_counter.size() <= min)){
             min = static_cast<int>(line_counter.size());
             min_path = a_path;
+            min_path_size = min_path.size();
         }
         //cout << endl << "LINE COUNTER: ";
         //for (auto st: line_counter) cout << st << " ";
@@ -241,8 +249,8 @@ vector<pair<int, string>> Graph::determineLessZonesCrossedPath(int s, int d)
             min = static_cast<int>(zone_counter.size());
             min_path = a_path;
         }
-        cout << endl << "ZONE COUNTER: ";
-        for (const auto& st: zone_counter) cout << st << " ";
+        /*cout << endl << "ZONE COUNTER: ";
+        for (const auto& st: zone_counter) cout << st << " ";*/
     }
     return min_path;
 }
@@ -274,10 +282,12 @@ vector<pair<int, string>> Graph::determineLessZonesCrossedPath(int s, int d)
 }*/
 double Graph::determineDistanceTraveled(const vector<int>& path){
     double distance = 0;
-    for (int i=0; i<path.size()-1;i++){
-        auto node1 = nodes[path[i]].stop;
-        auto node2 = nodes[path[i+1]].stop;
-        distance+=haversine(node1.getLatitude(), node1.getLongitude(), node2.getLatitude(), node2.getLongitude());
+    if(!path.empty()) {
+        for (int i = 0; i < path.size() - 1; i++) {
+            auto node1 = nodes[path[i]].stop;
+            auto node2 = nodes[path[i + 1]].stop;
+            distance += haversine(node1.getLatitude(), node1.getLongitude(), node2.getLatitude(), node2.getLongitude());
+        }
     }
     return distance;
 }

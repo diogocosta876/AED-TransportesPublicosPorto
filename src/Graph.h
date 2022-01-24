@@ -76,7 +76,7 @@ public:
      * @param a id de node inicial
      * @param b id de node de destino
     */
-    void determineLessLineChangesPath_util(int u, int d, bool visited[], vector<pair<int, string>>&path, vector<vector<pair<int, string>>>& path_store, string line);
+    void determineLessLineChangesPath_util(int u, int d, bool visited[], vector<pair<int, string>>path, vector<vector<pair<int, string>>>& path_store, string line);
 
     /**
      * Pesquisa DFS de complexidade temporal O(V^V) que itera todos os caminhos possíveis

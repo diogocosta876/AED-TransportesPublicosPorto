@@ -9,6 +9,8 @@ void AdminMenu::mainMenu(int page_counter) {
     //For faster development //TODO REMOVE PATH DEBUGGING SCREEN
     //selectedStopID_origin = 215;
     //selectedStopID_destination = 234;
+    selectedStopID_origin = 1123;
+    selectedStopID_destination = 1124;
 
     //Checks if stops have already been selected
     if(selectedStopID_origin != -1 && selectedStopID_destination != -1) tripMenu();
@@ -197,7 +199,7 @@ void AdminMenu::tripMenu() {
         case 1: {
             //SHORTEST PATH (DIJKSTRA)
             auto path_data = data.getGraph().dijkstra_util(selectedStopID_origin, selectedStopID_destination);
-            pathMenu(path_data.first.first, path_data.first.second, path_data.second);
+            pathMenu(path_data.first.first, path_data.first.second);
             break;
         }
         case 2: {

@@ -4,10 +4,10 @@
 using namespace std;
 
 LoadData::LoadData(double walking_distance): graph(vector<Stop*>{}) {
+    this->walking_distance = walking_distance;
     loadStops();
     loadLines();
     buildGraph();
-    this->walking_distance = walking_distance;
 }
 
 void LoadData::loadStops() {
@@ -86,9 +86,11 @@ void LoadData::buildGraph() {
     }
 
     // Add edges based on the walking_distance variable
+    double distance;
     for(pair<string, int> stop1_data: stopCodes){
         for(pair<string, int> stop2_data: stopCodes){
-            if (stop1_data.second != stop2_data.second && getDistance(*stops[stop1_data.second], *stops[stop2_data.second]) <= walking_distance){
+            distance = getDistance(*stops[stop1_data.second], *stops[stop2_data.second]);
+            if (stop1_data.second != stop2_data.second && distance < walking_distance){
                 graph.addEdge(stop1_data.second, stop2_data.second, "WALK");
                 graph.addEdge(stop2_data.second, stop1_data.second, "WALK");
             }
