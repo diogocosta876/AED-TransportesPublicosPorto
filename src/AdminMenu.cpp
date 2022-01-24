@@ -335,106 +335,104 @@ void AdminMenu::selectStopByCodeMenu() {
     }
 }
 
-void AdminMenu::selectStopByLocationMenu(bool userInsertedLocation, double lat, double lon) {
-    if (!userInsertedLocation){
-        while (lat == -INT_MAX) {
-            cin.clear();
-            if (!cin) cin.ignore(1000,'\n');
-            cout << "Insert latitude > ";
-            cin >> lat;
-        }
-        while (lon == -INT_MAX) {
-            cin.clear();
-            if (!cin) cin.ignore(1000,'\n');
-            cout << "Insert longitude > ";
-            cin >> lon;
-        }
-        selectStopByLocationMenu(true, lat, lon);
+void AdminMenu::selectStopByLocationMenu() {
+    double lat = -INT_MAX;
+    double lon = -INT_MAX;
+
+    while (lat == -INT_MAX) {
+        cin.clear();
+        if (!cin) cin.ignore(1000,'\n');
+        cout << "Insert latitude > ";
+        cin >> lat;
     }
-    else {
-        vector<pair<Stop*, double>> closest_stops;
-        double min_dist = INT_MAX;
-        for(Stop* stop: data.getStops()){
+    while (lon == -INT_MAX) {
+        cin.clear();
+        if (!cin) cin.ignore(1000,'\n');
+        cout << "Insert longitude > ";
+        cin >> lon;
+    }
+    vector<pair<Stop*, double>> closest_stops;
+    double min_dist = INT_MAX;
+    for(Stop* stop: data.getStops()){
 
-            sort(closest_stops.begin(), closest_stops.end(), [ ]( const pair<Stop*, double>& lhs, const pair<Stop*, double>& rhs )
-            {
-                return lhs.second < rhs.second;
-            });
+        sort(closest_stops.begin(), closest_stops.end(), [ ]( const pair<Stop*, double>& lhs, const pair<Stop*, double>& rhs )
+        {
+            return lhs.second < rhs.second;
+        });
 
-            double dist = Graph::haversine(lat, lon, stop->getLatitude(), stop->getLongitude());
-            if (dist < min_dist){
-                pair<Stop*, double> mypair;
-                mypair.first = stop; mypair.second = dist;
-                if(closest_stops.size() < 5)
-                    closest_stops.push_back(mypair);
-                else {
-                    closest_stops[4] = mypair;
-                    min_dist = closest_stops[3].second;
-                }
+        double dist = Graph::haversine(lat, lon, stop->getLatitude(), stop->getLongitude());
+        if (dist < min_dist){
+            pair<Stop*, double> mypair;
+            mypair.first = stop; mypair.second = dist;
+            if(closest_stops.size() < 5)
+                closest_stops.push_back(mypair);
+            else {
+                closest_stops[4] = mypair;
+                min_dist = closest_stops[3].second;
             }
         }
+    }
 
-        //OUTPUT
-        printTitle();
+    //OUTPUT
+    printTitle();
 
-        int table_length = 80;
-        cout << "5 CLOSEST STOPS:\n";
-        //Table Line Separator
-        for (int i = 0; i < table_length; ++i) cout << "-";
-        cout << "\n";
-        printInTable("ID", 10);
-        printInTable("Stop Code", 15);
-        printInTable("Stop Name", 25);
-        printInTable("Zone", 10);
-        printInTable("Distance", 13);
+    int table_length = 80;
+    cout << "5 CLOSEST STOPS:\n";
+    //Table Line Separator
+    for (int i = 0; i < table_length; ++i) cout << "-";
+    cout << "\n";
+    printInTable("ID", 10);
+    printInTable("Stop Code", 15);
+    printInTable("Stop Name", 25);
+    printInTable("Zone", 10);
+    printInTable("Distance", 13);
+    cout << "|\n";
+    //Table Line Separator
+    for (int i = 0; i < table_length; ++i) cout << "-";
+    cout << "\n";
+
+    //Table Content
+    for (int i = 0; i < closest_stops.size(); ++i) {
+        printInTable(to_string(i), 10);
+        printInTable(closest_stops[i].first->getCode(), 15);
+        printInTable(closest_stops[i].first->getName(), 25);
+        printInTable(closest_stops[i].first->getZone(), 10);
+        printInTable(to_string(closest_stops[i].second), 13);
         cout << "|\n";
-        //Table Line Separator
-        for (int i = 0; i < table_length; ++i) cout << "-";
-        cout << "\n";
+    }
+    //Table Line Separator
+    for (int i = 0; i < table_length; ++i) cout << "-";
+    cout << "\n\n";
+    cout << "\tAdmin Menu\n";
+    cout << "(1) Select a Stop\n";
+    cout << "(2) Go Back\n";
+    cout << "(0) Exit\n";
+    cout << " > ";
 
-        //Table Content
-        for (int i = 0; i < closest_stops.size(); ++i) {
-            printInTable(to_string(i), 10);
-            printInTable(closest_stops[i].first->getCode(), 15);
-            printInTable(closest_stops[i].first->getName(), 25);
-            printInTable(closest_stops[i].first->getZone(), 10);
-            printInTable(to_string(closest_stops[i].second), 13);
-            cout << "|\n";
-        }
-        //Table Line Separator
-        for (int i = 0; i < table_length; ++i) cout << "-";
-        cout << "\n\n";
-        cout << "\tAdmin Menu\n";
-        cout << "(1) Select a Stop\n";
-        cout << "(2) Go Back\n";
-        cout << "(0) Exit\n";
-        cout << " > ";
+    //Receive input
+    vector<int> possible_inputs = {0, 1, 2};
+    vector<int> possible_inputs_selection;
+    int input;
+    int input_sub;
+    input = getUserInput(possible_inputs);
 
-        //Receive input
-        vector<int> possible_inputs = {0, 1, 2};
-        vector<int> possible_inputs_selection;
-        int input;
-        int input_sub;
-        input = getUserInput(possible_inputs);
-
-        switch (input) {
-            case 1:
-                for (int i = 0; i < closest_stops.size(); ++i) possible_inputs_selection.push_back(i);
-                cout << "(0 to " + to_string(closest_stops.size()-1)+")";
-                input_sub = getUserInput(possible_inputs_selection);
-                selectStop(closest_stops[input_sub].first);
-                clearScreen();
-                mainMenu(1);
-                break;
-            case 2:
-                clearScreen();
-                mainMenu(1);
-                break;
-            case 0:
-                exit(0);
-            default:
-                break;
-        }
+    switch (input) {
+        case 1:
+            for (int i = 0; i < closest_stops.size(); ++i) possible_inputs_selection.push_back(i);
+            cout << "(0 to " + to_string(closest_stops.size()-1)+")";
+            input_sub = getUserInput(possible_inputs_selection);
+            selectStop(closest_stops[input_sub].first);
+            clearScreen();
+            mainMenu(1);
+            break;
+        case 2:
+            clearScreen();
+            mainMenu(1);
+            break;
+        case 0:
+            exit(0);
+        default:
+            break;
     }
 }
 
@@ -504,7 +502,6 @@ void AdminMenu::printInTable(const string &s, int linelength) {
     if ( spaces > 0 ) cout << string( spaces, ' ' );
     if (uneven) cout << " ";
 }
-
 
 void AdminMenu::clearScreen() {
     for (int i = 0; i < 20; ++i) {

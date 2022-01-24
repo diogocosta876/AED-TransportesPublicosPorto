@@ -247,7 +247,7 @@ vector<pair<int, string>> Graph::determineLessZonesCrossedPath(int s, int d)
     return min_path;
 }
 
-list<string> Graph::determineLineChanges(vector<int> path) {
+/*list<string> Graph::determineLineChanges(vector<int> path) {
     list<string> lines_used;
     string current_line; //line being used
     bool found_same_line;
@@ -271,7 +271,7 @@ list<string> Graph::determineLineChanges(vector<int> path) {
         }
     }
     return lines_used;
-}
+}*/
 double Graph::determineDistanceTraveled(const vector<int>& path){
     double distance = 0;
     for (int i=0; i<path.size()-1;i++){

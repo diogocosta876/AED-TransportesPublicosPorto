@@ -1,6 +1,5 @@
 #include <fstream>
 #include "LoadData.h"
-#include "Graph.h"
 
 using namespace std;
 
@@ -26,7 +25,7 @@ void LoadData::loadStops() {
         name = textLine.substr(0, textLine.find(','));
         textLine = textLine.substr(textLine.find(',')+1, textLine.size());
         zone = textLine.substr(0, textLine.find(','));
-        aux = textLine = textLine.substr(textLine.find(',')+1, textLine.size());;
+        aux = textLine = textLine.substr(textLine.find(',')+1, textLine.size());
         latitude = stod(aux.substr(0, textLine.find(',')));
         aux = aux.substr(aux.find(',') + 1, aux.size());
         longitude = stod(aux);
@@ -51,12 +50,12 @@ void LoadData::loadLines() {
         lines.emplace_back(new Line(code, name));
     }
     for (Line* line: lines){
-        string textLine, stops_count;
-        ifstream MyReadFile("../data/Line_" + line->getCode() + "_0.csv");
-        getline (MyReadFile, stops_count);
+        string textLine2, stops_count;
+        ifstream MyReadFile2("../data/Line_" + line->getCode() + "_0.csv");
+        getline (MyReadFile2, stops_count);
         for (int i = 0; i < stoi(stops_count) ; ++i) {
-            getline (MyReadFile, textLine);
-            Stop* stop = stops[stopCodes.find(textLine)->second];
+            getline (MyReadFile2, textLine2);
+            Stop* stop = stops[stopCodes.find(textLine2)->second];
             line->addStop(stop);
         }
     }
