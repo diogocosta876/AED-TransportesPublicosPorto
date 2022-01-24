@@ -7,8 +7,8 @@ AdminMenu::AdminMenu(LoadData data): data(std::move(data)){}
 
 void AdminMenu::mainMenu(int page_counter) {
     //For faster development //TODO REMOVE PATH DEBUGGING SCREEN
-    selectedStopID_origin = 215;
-    selectedStopID_destination = 234;
+    //selectedStopID_origin = 215;
+    //selectedStopID_destination = 234;
 
     //Checks if stops have already been selected
     if(selectedStopID_origin != -1 && selectedStopID_destination != -1) tripMenu();
