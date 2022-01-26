@@ -39,7 +39,7 @@ public:
      */
     explicit Graph(const vector<Stop*>& stops);
     /**
-     * Método void que adiciona uma edge ao grafo, dados os índices de duas nodes
+     * Método void que adiciona uma edge ao grafo, dados os índices de duas nodes. Complexidade temporal O(1)
      * @param src id de node
      * @param dest id de node
      * @param linecode código de linha

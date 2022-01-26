@@ -21,7 +21,7 @@ class LoadData {
 
 public:
     /**
-     * Construtor da classe
+     * Construtor da classe, chama loadStops(), loadLines() e buildGraph()
      * @param walking_distance inteiro que define a distância máxima entre paragens para poderem
      * ser conectadas no grafo simulando caminho pedestre
      */
@@ -48,19 +48,21 @@ public:
     void debug_displayEdges() const;
 private:
     /**
-     * Método void que dá parse ao dataset e introduz as paragens nos atributos
-     * stopCodes e stops
+     * Método void que dá parse ao dataset e introduz as paragens nos atributos stopCodes e stops.
+     * Complexidade temporal O(n)
      */
     void loadStops();
 
     /**
      * Método void que dá parse ao dataset e introduz as linhas no atributo lines
+     * Complexidade temporal O(n+n*m) n->nº de linhas  m->nº médio de paragens por linha
     */
     void loadLines();
 
     /**
      * Método void que utiliza os atributos lines e stops para construir o grafo e as respetivas edges.
-     * Cria também edges adicionais se a distância entre quaiquer duas nodes
+     * Cria também edges adicionais se a distância entre quaiquer duas nodes.
+     * Complexidade temporal O(n*m) n->nº de linhas  m->nº médio de paragens por linha
      * se verificar inferior que o atributo walking_distrance
     */
     void buildGraph();
