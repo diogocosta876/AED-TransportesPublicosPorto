@@ -68,7 +68,7 @@ public:
     vector<int> bfsPathSearch(int src, int dest);
 
     /**
-     * Pesquisa DFS de complexidade temporal O(V^V) que itera todos os caminhos possíveis
+     * Pesquisa DFS de complexidade temporal O(|V|^|V|) que itera todos os caminhos possíveis
      * da node de origem até à node de destino e guarda-os em path_store (guarda zonas percorridas)
      * @param a id de node inicial
      * @param b id de node de destino
@@ -76,7 +76,7 @@ public:
     void determineLessLineChangesPath_util(int u, int d, bool visited[], vector<pair<int, string>>path, vector<vector<pair<int, string>>>& path_store, string line);
 
     /**
-     * Pesquisa DFS de complexidade temporal O(V^V) que itera todos os caminhos possíveis
+     * Pesquisa DFS de complexidade temporal O(|V|^|V|) que itera todos os caminhos possíveis
      * da node de origem até à node de destino e guarda-os em path_stores (guarda linhas usadas)
      * @param a id de node inicial
      * @param b id de node de destino

@@ -33,8 +33,6 @@ void LoadData::loadStops() {
         counter++;
     }
 }
-
-
 void LoadData::loadLines() {
     string textLine;
     ifstream MyReadFile("../data/Lines.csv");

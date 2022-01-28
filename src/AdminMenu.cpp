@@ -205,7 +205,7 @@ void AdminMenu::tripMenu() {
         }
         case 3: {
             //PATH WITH LESS LINE CHANGES
-            cout << "\nComputing... (currently capped at 7 stops length search)\n";
+            cout << "\nComputing... (currently capped at 6 stops length search)\n";
             auto path_data = data.getGraph().determineLessLineChangesPath(selectedStopID_origin, selectedStopID_destination);
             vector<int> path;
             vector<string> lines;
@@ -219,7 +219,7 @@ void AdminMenu::tripMenu() {
         }
         case 4: {
             //PATH WITH LESS ZONES CROSSED
-            cout << "\nComputing... (currently capped at 7 stops length search)\n";
+            cout << "\nComputing... (currently capped at 6 stops length search)\n";
             auto path_data = data.getGraph().determineLessZonesCrossedPath(selectedStopID_origin,
                                                                           selectedStopID_destination);
             vector<int> path;

@@ -120,7 +120,7 @@ void Graph::determineLessLineChangesPath_util(int u, int d, bool visited[], vect
     path.push_back(mypair);
 
     // If current vertex is same as destination, then print
-    if (path.size() > 7) {
+    if (path.size() > 6) {
         visited[u] = false;
         return;
     }
@@ -156,7 +156,7 @@ void Graph::determineLessZonesCrossedPath_util(int u, int d, bool visited[], vec
     path.push_back(mypair);
 
     // If current vertex is same as destination, then print
-    if (path.size() > 7) {
+    if (path.size() > 6) {
         visited[u] = false;
         return;
     }
@@ -292,4 +292,17 @@ void Graph::debug_displayEdges() const {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
