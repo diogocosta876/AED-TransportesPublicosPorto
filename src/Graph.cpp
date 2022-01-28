@@ -1,9 +1,4 @@
-// AED 2021/2022 - Aula Pratica 09
-// Pedro Ribeiro (DCC/FCUP) [03/01/2022]
-
 #include "Graph.h"
-
-#include <utility>
 
 // Constructor: nr nodes and direction (default: undirected)
 Graph::Graph(const vector<Stop*>& stops) {
@@ -125,18 +120,16 @@ void Graph::determineLessLineChangesPath_util(int u, int d, bool visited[], vect
     path.push_back(mypair);
 
     // If current vertex is same as destination, then print
-    if (path.size() > 5) {
+    if (path.size() > 7) {
         visited[u] = false;
         return;
     }
 
     if (u == d) {
         //FOR VISUALIZATION OF THE PATHS ITERATED
-        /*
-        for (int i = 0; i < path.size(); i++)
+        /*for (int i = 0; i < path.size(); i++)
             cout << path[i].first << " line:" << path[i].second << "  ";
-        cout << "\n";
-         */
+        cout << "\n";*/
         path_store.push_back(path);
     }
 
@@ -163,7 +156,7 @@ void Graph::determineLessZonesCrossedPath_util(int u, int d, bool visited[], vec
     path.push_back(mypair);
 
     // If current vertex is same as destination, then print
-    if (path.size() > 6) {
+    if (path.size() > 7) {
         visited[u] = false;
         return;
     }
@@ -255,31 +248,6 @@ vector<pair<int, string>> Graph::determineLessZonesCrossedPath(int s, int d)
     return min_path;
 }
 
-/*list<string> Graph::determineLineChanges(vector<int> path) {
-    list<string> lines_used;
-    string current_line; //line being used
-    bool found_same_line;
-    for (int i = 0; i<path.size();i++){
-        found_same_line = false;
-        //find edge that connects stopID and stopID+1 from path, then see if the line is alreay registed
-        auto edges = nodes[path[i]].adj;
-        for (const Edge& edge: edges){
-            if (edge.dest == path[i+1] && edge.lineCode == current_line){
-                found_same_line = true;
-                break;
-            }
-        }
-        if (!found_same_line){
-            for (const Edge& edge: nodes[path[i]].adj) {
-                if (edge.dest == path[i+1]) {
-                    current_line = edge.lineCode;
-                    lines_used.push_back(edge.lineCode);
-                }
-            }
-        }
-    }
-    return lines_used;
-}*/
 double Graph::determineDistanceTraveled(const vector<int>& path){
     double distance = 0;
     if(!path.empty()) {

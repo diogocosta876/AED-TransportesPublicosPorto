@@ -1,19 +1,13 @@
-
 #include "AdminMenu.h"
-
 #include <utility>
 
 AdminMenu::AdminMenu(LoadData data): data(std::move(data)){}
 
 void AdminMenu::mainMenu(int page_counter) {
-    //For faster development //TODO REMOVE PATH DEBUGGING SCREEN
-    //selectedStopID_origin = 215;
-    //selectedStopID_destination = 234;
-    selectedStopID_origin = 1123;
-    selectedStopID_destination = 1124;
-
     //Checks if stops have already been selected
-    if(selectedStopID_origin != -1 && selectedStopID_destination != -1) tripMenu();
+    if(selectedStopID_origin != -1 && selectedStopID_destination != -1)
+        tripMenu();
+
     printTitle();
 
     int table_length = 69;
@@ -183,11 +177,12 @@ void AdminMenu::tripMenu() {
     cout << "\tAdmin Menu\n";
     cout << "(1) Determine the Shortest Path\n";
     cout << "(2) Determine the Path with less Stops\n";
-    cout << "(3) Determine the Path with less Line Changes\n";
-    cout << "(4) Determine the Cheapest Path (less zones crossed)\n";
+    cout << "(3) Determine the Path with less Line Changes *\n";
+    cout << "(4) Determine the Cheapest Path (less zones crossed) *\n";
     cout << "(5) Change Walking Distance\n";
     cout << "(6) Go Back\n";
     cout << "(0) Exit\n";
+    cout << "* -> limited searching capatility because of exponencial temporal complexity\n";
     cout << " > ";
 
     //Receive input
@@ -210,6 +205,7 @@ void AdminMenu::tripMenu() {
         }
         case 3: {
             //PATH WITH LESS LINE CHANGES
+            cout << "\nComputing... (currently capped at 7 stops length search)\n";
             auto path_data = data.getGraph().determineLessLineChangesPath(selectedStopID_origin, selectedStopID_destination);
             vector<int> path;
             vector<string> lines;
@@ -223,6 +219,7 @@ void AdminMenu::tripMenu() {
         }
         case 4: {
             //PATH WITH LESS ZONES CROSSED
+            cout << "\nComputing... (currently capped at 7 stops length search)\n";
             auto path_data = data.getGraph().determineLessZonesCrossedPath(selectedStopID_origin,
                                                                           selectedStopID_destination);
             vector<int> path;

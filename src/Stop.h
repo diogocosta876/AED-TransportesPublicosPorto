@@ -23,11 +23,11 @@ public:
      */
     Stop(const string &code, const string &name, const string &zone, double latitude, double longitude);
     /** Getter do atributo code */
-    const std::string& getCode() const;
+    const string& getCode() const;
     /** Getter do atributo name */
-    const std::string& getName() const;
+    const string& getName() const;
     /** Getter do atributo zone */
-    const std::string& getZone() const;
+    const string& getZone() const;
     /** Getter do atributo latitude */
     double getLatitude() const;
     /** Getter do atributo longitude */

@@ -8,6 +8,7 @@
 #include "Graph.h"
 #include "Line.h"
 #include "Stop.h"
+#include <fstream>
 #include "vector"
 #include <iterator>
 #include <map>

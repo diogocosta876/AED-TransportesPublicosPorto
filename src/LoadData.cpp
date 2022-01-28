@@ -1,4 +1,3 @@
-#include <fstream>
 #include "LoadData.h"
 
 using namespace std;
