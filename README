@@ -1,0 +1,27 @@
+### STCP - Transportes Públicos do Porto ###
+
+## Choosing an the origin and destination stops ##
+There are 3 possibilities for choosing each stop
+- Through the menu by selecting a line and then a given stop belonging to it
+- Through its unique code (e.g ARS5)
+- Trough a search by latitute and longitude (returns the 5 closest stops)
+
+!(https://myoctocat.com/assets/images/base-octocat.svg)
+
+## Choosing the best path ##
+There are 4 different definitions of "best path" available to choose from.
+- Shortest Path - uses the dijsktra algorithm with O(|E|*log|V|) complexity
+- Path that crosses less stops - bfs search with O(|E|+|V|) complexity
+- Path with less line changes - dfs search with O(|V|*|V|) complexity
+- Path that crosses less zones - dfs search with O(|V|*|V|) complexity
+|V| indicates the number of nodes or vertices
+|E| indicates the number of edges in the graph (connections between nodes)
+The walking distance allows the user to go to another stop without using the bus. This is usefull because there are often stops right beside each other that don't have a bus connection.
+
+!(https://myoctocat.com/assets/images/base-octocat.svg)
+
+Note that the last two definitions of shortest path could be achieved with a better time complexity by using 2 ou more graphs instead of 1.
+
+!(https://myoctocat.com/assets/images/base-octocat.svg)
+
+After computing the shortest path the program will show the user the stops he has to cross, the distance travelled and the lines/zones crossed in case the user used the 3rd or 4rth algorithm.
